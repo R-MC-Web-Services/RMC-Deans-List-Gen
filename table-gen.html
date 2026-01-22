@@ -16,32 +16,75 @@
             font-family: 'Roboto', sans-serif;
             background: linear-gradient(135deg, #000 0%, #ffcf00 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
         
         .container {
+            max-width: 1200px;
+            margin: 0 auto;
             background: white;
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 600px;
-            width: 100%;
         }
         
         h1 {
             color: #333;
             margin-bottom: 10px;
-            text-align: center;
         }
         
         .subtitle {
             color: #666;
-            text-align: center;
             margin-bottom: 30px;
             font-size: 14px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #ffcf00;
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .section p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        textarea {
+            width: 100%;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            background: #fff;
+            min-height: 300px;
+            resize: vertical;
+        }
+        
+        .copy-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #000;
+            color: #ffcf00;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .copy-btn:hover {
+            background: #333;
         }
         
         .upload-section {
@@ -62,12 +105,6 @@
             border-radius: 8px;
             background: #fffbf0;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        input[type="file"]:hover {
-            border-color: #000;
-            background: #fff9e6;
         }
         
         input[type="text"] {
@@ -78,7 +115,7 @@
             font-family: 'Roboto', sans-serif;
         }
         
-        button {
+        .generate-btn {
             width: 100%;
             padding: 15px;
             background: linear-gradient(135deg, #ffcf00 0%, #ffb000 100%);
@@ -88,413 +125,277 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
             margin-top: 10px;
         }
         
-        button:hover {
+        .generate-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(255, 207, 0, 0.4);
         }
         
-        button:disabled {
+        .generate-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
-        }
-        
-        button.secondary {
-            background: linear-gradient(135deg, #000 0%, #333 100%);
-            color: #ffcf00;
-            margin-top: 5px;
         }
         
         .status {
-            margin-top: 20px;
+            margin-top: 15px;
             padding: 15px;
             background: #e8f5e9;
             border-radius: 8px;
             color: #2e7d32;
-            text-align: center;
             display: none;
         }
         
         .error {
-            background: #fee;
-            color: #c33;
-            padding: 15px;
-            border-radius: 8px;
             margin-top: 15px;
-            display: none;
-        }
-        
-        .info-box {
-            background: #fff9e6;
-            border-left: 4px solid #ffcf00;
             padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            font-size: 14px;
+            background: #fee;
+            border-radius: 8px;
+            color: #c33;
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>📋 Dean's List Table Code Generator</h1>
-        <p class="subtitle">Generate HTML/CSS/JS code for your WordPress page</p>
+        <p class="subtitle">Generate code snippets for your WordPress Dean's List page</p>
         
-        <div class="info-box">
-            <strong>Two outputs:</strong><br>
-            1. <strong>CSS/JS</strong> - Add to WordPress once<br>
-            2. <strong>Table HTML</strong> - Regenerate each semester
+        <!-- STEP 1: CSS -->
+        <div class="section">
+            <h2>Step 1: Copy CSS (One Time - Add to WordPress)</h2>
+            <p>Copy this CSS and add it to your WordPress page once. This styles the table and modal.</p>
+            <textarea id="cssCode" readonly></textarea>
+            <button class="copy-btn" onclick="copyToClipboard('cssCode')">📋 Copy CSS</button>
         </div>
         
-        <div class="upload-section">
-            <label for="excel">Student Data (Excel/CSV):</label>
-            <input type="file" id="excel" accept=".xlsx,.xls,.csv">
+        <!-- STEP 2: HTML for Modal -->
+        <div class="section">
+            <h2>Step 2: Copy Modal HTML (One Time - Add to WordPress)</h2>
+            <p>Copy this HTML and add it to your WordPress page once. This is the modal structure.</p>
+            <textarea id="modalHTML" readonly></textarea>
+            <button class="copy-btn" onclick="copyToClipboard('modalHTML')">📋 Copy Modal HTML</button>
         </div>
         
-        <div class="upload-section">
-            <label for="prefix">Filename Prefix (used in certificate generator):</label>
-            <input type="text" id="prefix" placeholder="Fall25">
+        <!-- STEP 3: JavaScript -->
+        <div class="section">
+            <h2>Step 3: Copy JavaScript (One Time - Add to WordPress)</h2>
+            <p>Copy this JavaScript and add it to your WordPress page once. This powers the search, filtering, and modal.</p>
+            <textarea id="jsCode" readonly></textarea>
+            <button class="copy-btn" onclick="copyToClipboard('jsCode')">📋 Copy JavaScript</button>
         </div>
         
-        <div class="upload-section">
-            <label for="imagePath">Path to Certificate Images:</label>
-            <input type="text" id="imagePath" placeholder="/wp-content/uploads/certificates/">
+        <!-- STEP 4: Generate Table HTML -->
+        <div class="section">
+            <h2>Step 4: Generate Table HTML (Each Semester)</h2>
+            <p>Upload your Excel file and generate the table HTML. This needs to be regenerated each semester with new student data.</p>
+            
+            <div class="upload-section">
+                <label for="excel">Student Data (Excel/CSV):</label>
+                <input type="file" id="excel" accept=".xlsx,.xls,.csv">
+            </div>
+            
+            <div class="upload-section">
+                <label for="prefix">Filename Prefix (from certificate generator):</label>
+                <input type="text" id="prefix" placeholder="Fall24">
+            </div>
+            
+            <div class="upload-section">
+                <label for="imagePath">Path to Certificate Images:</label>
+                <input type="text" id="imagePath" placeholder="/wp-content/uploads/certificates/">
+            </div>
+            
+            <button class="generate-btn" id="generateBtn" disabled>Generate Table HTML</button>
+            
+            <div class="status" id="status"></div>
+            <div class="error" id="error"></div>
+            
+            <div id="tableOutputSection" style="display: none; margin-top: 20px;">
+                <h3 style="margin-bottom: 10px;">Generated Table HTML:</h3>
+                <textarea id="tableHTML" readonly style="min-height: 200px;"></textarea>
+                <button class="copy-btn" onclick="copyToClipboard('tableHTML')">📋 Copy Table HTML</button>
+            </div>
         </div>
-        
-        <button id="generateCSS">Download CSS/JS (One Time Setup)</button>
-        <button id="generateHTML" class="secondary" disabled>Download Table HTML (Each Semester)</button>
-        
-        <div class="status" id="status"></div>
-        <div class="error" id="error"></div>
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <script>
-        let studentData = [];
-        
-        const excelInput = document.getElementById('excel');
-        const prefixInput = document.getElementById('prefix');
-        const imagePathInput = document.getElementById('imagePath');
-        const generateCSSBtn = document.getElementById('generateCSS');
-        const generateHTMLBtn = document.getElementById('generateHTML');
-        const statusDiv = document.getElementById('status');
-        const errorDiv = document.getElementById('error');
-        
-        // Load Excel/CSV file
-        excelInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            try {
-                const data = await file.arrayBuffer();
-                const workbook = XLSX.read(data);
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-                
-                console.log('Raw Excel data:', jsonData);
-                
-                if (jsonData.length > 0) {
-                    console.log('Available columns:', Object.keys(jsonData[0]));
-                }
-                
-                studentData = jsonData.map(row => {
-                    const first = row.First || row.first || row.FIRST || row['First Name'] || row.firstname || row.FirstName || row.first_name || row.FIRST_NAME || '';
-                    const last = row.Last || row.last || row.LAST || row['Last Name'] || row.lastname || row.LastName || row.last_name || row.LAST_NAME || '';
-                    const major = row.Major || row.major || row.MAJOR || '';
-                    
-                    return { first, last, major };
-                });
-                
-                console.log('Processed student data:', studentData);
-                
-                if (studentData.length === 0) {
-                    showError('No student data found in file');
-                } else {
-                    showStatus(`Loaded ${studentData.length} students`);
-                    generateHTMLBtn.disabled = false;
-                }
-                
-            } catch (err) {
-                showError('Error reading file: ' + err.message);
-            }
-        });
-        
-        function showStatus(message) {
-            statusDiv.textContent = message;
-            statusDiv.style.display = 'block';
-            errorDiv.style.display = 'none';
-        }
-        
-        function showError(message) {
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            statusDiv.style.display = 'none';
-        }
-        
-        // Generate CSS/JS (one-time)
-        generateCSSBtn.addEventListener('click', () => {
-            const cssJsContent = generateCSSJS();
-            downloadFile(cssJsContent, 'deans-list-styles-and-scripts.html');
-            showStatus('✅ CSS/JS downloaded! Add this to your WordPress page once.');
-        });
-        
-        // Generate Table HTML
-        generateHTMLBtn.addEventListener('click', () => {
-            const prefix = prefixInput.value.trim();
-            const imagePath = imagePathInput.value.trim();
-            
-            if (!prefix) {
-                showError('Please enter a filename prefix');
-                return;
-            }
-            
-            if (!imagePath) {
-                showError('Please enter the path to your certificate images');
-                return;
-            }
-            
-            const htmlContent = generateTableHTML(studentData, prefix, imagePath);
-            downloadFile(htmlContent, 'deans-list-table.html');
-            showStatus('✅ Table HTML downloaded! Paste this into your WordPress page.');
-        });
-        
-        function downloadFile(content, filename) {
-            const blob = new Blob([content], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-        
-        function generateTableHTML(students, prefix, imagePath) {
-            const path = imagePath.endsWith('/') ? imagePath : imagePath + '/';
-            
-            const studentsJSON = JSON.stringify(students.map(s => ({
-                first: s.first,
-                last: s.last,
-                major: s.major,
-                image: `${path}${prefix}-${s.first}${s.last}.png`
-            })), null, 2);
-            
-            return `<!-- Dean's List Table HTML -->
-<!-- Paste this section into your WordPress page where you want the table to appear -->
+        // Static CSS code
+        const cssCode = `<style>
+.deans-list-search {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 8px;
+}
 
-<div class="deans-list-container">
-    <div class="deans-list-search">
-        <input type="text" id="deansListSearch" placeholder="Search by student name or major...">
-        <a href="#" class="reset-filter" id="deansListReset">Reset Filter</a>
-    </div>
-    
-    <table class="deans-list-table">
-        <thead>
-            <tr>
-                <th>Student Name</th>
-                <th>Major</th>
-            </tr>
-        </thead>
-        <tbody id="deansListTableBody">
-            <!-- Students will be inserted here by JavaScript -->
-        </tbody>
-    </table>
-    
-    <div id="deansListNoResults" class="no-results" style="display: none;">
-        No students found matching your search.
-    </div>
-</div>
+.deans-list-search input {
+    width: 100%;
+    max-width: 500px;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+}
 
-<script>
-// Dean's List student data
-window.deansListStudents = ${studentsJSON};
-</script>
+.deans-list-search input:focus {
+    outline: none;
+    border-color: #ffcf00;
+}
 
-<!-- End Dean's List Table HTML -->`;
-        }
-        
-        function generateCSSJS() {
-            return `<!-- Dean's List Styles and Scripts -->
-<!-- Add this to your WordPress page ONCE (before the table HTML) -->
-<!-- This contains all the CSS and JavaScript needed for the table and modal -->
+.reset-filter {
+    margin-left: 10px;
+    color: #000;
+    text-decoration: underline;
+    cursor: pointer;
+}
 
-<style>
-    .deans-list-search {
-        margin: 20px 0;
-        padding: 20px;
-        background: #f5f5f5;
-        border-radius: 8px;
-    }
-    
-    .deans-list-search input {
-        width: 100%;
-        max-width: 500px;
-        padding: 12px;
-        font-size: 16px;
-        border: 2px solid #ddd;
-        border-radius: 4px;
-    }
-    
-    .deans-list-search input:focus {
-        outline: none;
-        border-color: #ffcf00;
-    }
-    
-    .reset-filter {
-        margin-left: 10px;
-        color: #000;
-        text-decoration: underline;
-        cursor: pointer;
-    }
-    
-    .reset-filter:hover {
-        color: #ffcf00;
-    }
-    
-    .deans-list-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-    
-    .deans-list-table th {
-        text-align: left;
-        padding: 12px;
-        background: #000;
-        color: #ffcf00;
-        font-weight: bold;
-    }
-    
-    .deans-list-table td {
-        padding: 12px;
-        border-bottom: 1px solid #ddd;
-    }
-    
-    .deans-list-table tr:hover {
-        background: #f9f9f9;
-    }
-    
-    .student-name {
-        color: #000;
-        cursor: pointer;
-        text-decoration: underline;
-    }
-    
-    .student-name:hover {
-        color: #ffcf00;
-    }
-    
-    .no-results {
-        text-align: center;
-        padding: 40px;
-        color: #666;
-        font-style: italic;
-    }
-    
-    /* Modal Styles */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
-        overflow: auto;
-    }
-    
-    .modal.active {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .modal-content {
-        background-color: #fff;
-        padding: 30px;
-        border-radius: 8px;
-        max-width: 90%;
-        max-height: 90vh;
-        overflow: auto;
-        position: relative;
-    }
-    
-    .modal-close {
-        position: absolute;
-        top: 10px;
-        right: 20px;
-        font-size: 32px;
-        font-weight: bold;
-        color: #000;
-        cursor: pointer;
-        background: none;
-        border: none;
-        line-height: 1;
-    }
-    
-    .modal-close:hover {
-        color: #ffcf00;
-    }
-    
-    .certificate-image {
-        max-width: 100%;
-        height: auto;
-        display: block;
-        margin: 0 auto 20px;
-        border-radius: 4px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-    
-    .social-share {
-        text-align: center;
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 2px solid #f0f0f0;
-    }
-    
-    .social-share h3 {
-        margin-bottom: 15px;
-        color: #333;
-    }
-    
-    .social-buttons {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    
-    .social-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 24px;
-        border-radius: 4px;
-        text-decoration: none;
-        color: white;
-        font-weight: bold;
-        transition: transform 0.2s;
-    }
-    
-    .social-btn:hover {
-        transform: translateY(-2px);
-    }
-    
-    .social-btn.facebook {
-        background: #1877f2;
-    }
-    
-    .social-btn.twitter {
-        background: #1da1f2;
-    }
-</style>
+.reset-filter:hover {
+    color: #ffcf00;
+}
 
-<!-- Modal Structure -->
-<div id="deansListModal" class="modal">
+.deans-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.deans-list-table th {
+    text-align: left;
+    padding: 12px;
+    background: #000;
+    color: #ffcf00;
+    font-weight: bold;
+}
+
+.deans-list-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.deans-list-table tr:hover {
+    background: #f9f9f9;
+}
+
+.student-name {
+    color: #000;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.student-name:hover {
+    color: #ffcf00;
+}
+
+.no-results {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-style: italic;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    overflow: auto;
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow: auto;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 32px;
+    font-weight: bold;
+    color: #000;
+    cursor: pointer;
+    background: none;
+    border: none;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: #ffcf00;
+}
+
+.certificate-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto 20px;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.social-share {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #f0f0f0;
+}
+
+.social-share h3 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.social-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    transition: transform 0.2s;
+}
+
+.social-btn:hover {
+    transform: translateY(-2px);
+}
+
+.social-btn.facebook {
+    background: #1877f2;
+}
+
+.social-btn.twitter {
+    background: #1da1f2;
+}
+</style>`;
+
+        // Static Modal HTML
+        const modalHTML = `<div id="deansListModal" class="modal">
     <div class="modal-content">
         <button class="modal-close" id="deansListModalClose">&times;</button>
         <img id="deansListModalCertificate" class="certificate-image" src="" alt="Certificate">
@@ -512,11 +413,11 @@ window.deansListStudents = ${studentsJSON};
             </div>
         </div>
     </div>
-</div>
+</div>`;
 
-<script>
+        // Static JavaScript code
+        const jsCode = `<script>
 (function() {
-    // Wait for student data to be available
     function initDeansListTable() {
         if (typeof window.deansListStudents === 'undefined') {
             setTimeout(initDeansListTable, 100);
@@ -534,9 +435,6 @@ window.deansListStudents = ${studentsJSON};
         const facebookShare = document.getElementById('deansListFacebookShare');
         const twitterShare = document.getElementById('deansListTwitterShare');
         
-        let currentStudent = null;
-        
-        // Render table
         function renderTable(filteredStudents) {
             tableBody.innerHTML = '';
             
@@ -549,14 +447,10 @@ window.deansListStudents = ${studentsJSON};
             
             filteredStudents.forEach(student => {
                 const row = document.createElement('tr');
-                row.innerHTML = \`
-                    <td><a href="#" class="student-name" data-first="\${student.first}" data-last="\${student.last}">\${student.last}, \${student.first}</a></td>
-                    <td>\${student.major}</td>
-                \`;
+                row.innerHTML = '<td><a href="#" class="student-name" data-first="' + student.first + '" data-last="' + student.last + '">' + student.last + ', ' + student.first + '</a></td><td>' + student.major + '</td>';
                 tableBody.appendChild(row);
             });
             
-            // Add click handlers
             document.querySelectorAll('.student-name').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -568,7 +462,6 @@ window.deansListStudents = ${studentsJSON};
             });
         }
         
-        // Search functionality
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
                 const query = e.target.value.toLowerCase();
@@ -581,7 +474,6 @@ window.deansListStudents = ${studentsJSON};
             });
         }
         
-        // Reset filter
         if (resetFilter) {
             resetFilter.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -590,18 +482,15 @@ window.deansListStudents = ${studentsJSON};
             });
         }
         
-        // Modal functions
         function openModal(student) {
-            currentStudent = student;
             modalCertificate.src = student.image;
-            modalCertificate.alt = \`Dean's List Certificate for \${student.first} \${student.last}\`;
+            modalCertificate.alt = 'Dean\\'s List Certificate for ' + student.first + ' ' + student.last;
             
-            // Update social share links
-            const shareText = encodeURIComponent(\`\${student.first} \${student.last} has earned Dean's List recognition at Randolph-Macon College!\`);
+            const shareText = encodeURIComponent(student.first + ' ' + student.last + ' has earned Dean\\'s List recognition at Randolph-Macon College!');
             const shareUrl = encodeURIComponent('https://www.rmc.edu/academics/deans-list/');
             
-            facebookShare.href = \`https://www.facebook.com/sharer/sharer.php?u=\${shareUrl}&quote=\${shareText}\`;
-            twitterShare.href = \`https://twitter.com/intent/tweet?text=\${shareText}&url=\${shareUrl}\`;
+            facebookShare.href = 'https://www.facebook.com/sharer/sharer.php?u=' + shareUrl + '&quote=' + shareText;
+            twitterShare.href = 'https://twitter.com/intent/tweet?text=' + shareText + '&url=' + shareUrl;
             
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -612,7 +501,6 @@ window.deansListStudents = ${studentsJSON};
             document.body.style.overflow = '';
         }
         
-        // Close modal events
         if (modalClose) {
             modalClose.addEventListener('click', closeModal);
         }
@@ -631,20 +519,138 @@ window.deansListStudents = ${studentsJSON};
             }
         });
         
-        // Initial render
         renderTable(students);
     }
     
-    // Initialize when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initDeansListTable);
     } else {
         initDeansListTable();
     }
 })();
-</script>
+<\/script>`;
 
-<!-- End Dean's List Styles and Scripts -->`;
+        // Load static content into textareas
+        document.getElementById('cssCode').value = cssCode;
+        document.getElementById('modalHTML').value = modalHTML;
+        document.getElementById('jsCode').value = jsCode;
+        
+        // Copy to clipboard function
+        function copyToClipboard(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            textarea.select();
+            document.execCommand('copy');
+            alert('Copied to clipboard!');
+        }
+        
+        window.copyToClipboard = copyToClipboard;
+        
+        // Excel upload and table generation
+        let studentData = [];
+        
+        const excelInput = document.getElementById('excel');
+        const prefixInput = document.getElementById('prefix');
+        const imagePathInput = document.getElementById('imagePath');
+        const generateBtn = document.getElementById('generateBtn');
+        const statusDiv = document.getElementById('status');
+        const errorDiv = document.getElementById('error');
+        const tableOutputSection = document.getElementById('tableOutputSection');
+        const tableHTMLTextarea = document.getElementById('tableHTML');
+        
+        excelInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            try {
+                const data = await file.arrayBuffer();
+                const workbook = XLSX.read(data);
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                
+                studentData = jsonData.map(row => {
+                    const first = row.First || row.first || row.FIRST || row['First Name'] || row.firstname || row.FirstName || row.first_name || row.FIRST_NAME || '';
+                    const last = row.Last || row.last || row.LAST || row['Last Name'] || row.lastname || row.LastName || row.last_name || row.LAST_NAME || '';
+                    const major = row.Major || row.major || row.MAJOR || '';
+                    
+                    return { first, last, major };
+                });
+                
+                if (studentData.length === 0) {
+                    showError('No student data found in file');
+                } else {
+                    showStatus('Loaded ' + studentData.length + ' students');
+                    generateBtn.disabled = false;
+                }
+                
+            } catch (err) {
+                showError('Error reading file: ' + err.message);
+            }
+        });
+        
+        generateBtn.addEventListener('click', () => {
+            const prefix = prefixInput.value.trim();
+            const imagePath = imagePathInput.value.trim();
+            
+            if (!prefix) {
+                showError('Please enter a filename prefix');
+                return;
+            }
+            
+            if (!imagePath) {
+                showError('Please enter the path to your certificate images');
+                return;
+            }
+            
+            const path = imagePath.endsWith('/') ? imagePath : imagePath + '/';
+            
+            const studentsJSON = JSON.stringify(studentData.map(s => ({
+                first: s.first,
+                last: s.last,
+                major: s.major,
+                image: path + prefix + '-' + s.first + s.last + '.png'
+            })), null, 2);
+            
+            const tableHTML = `<div class="deans-list-container">
+    <div class="deans-list-search">
+        <input type="text" id="deansListSearch" placeholder="Search by student name or major...">
+        <a href="#" class="reset-filter" id="deansListReset">Reset Filter</a>
+    </div>
+    
+    <table class="deans-list-table">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Major</th>
+            </tr>
+        </thead>
+        <tbody id="deansListTableBody">
+        </tbody>
+    </table>
+    
+    <div id="deansListNoResults" class="no-results" style="display: none;">
+        No students found matching your search.
+    </div>
+</div>
+
+<script>
+window.deansListStudents = ` + studentsJSON + `;
+<\/script>`;
+            
+            tableHTMLTextarea.value = tableHTML;
+            tableOutputSection.style.display = 'block';
+            showStatus('Table HTML generated! Copy and paste into WordPress.');
+        });
+        
+        function showStatus(message) {
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            errorDiv.style.display = 'none';
+        }
+        
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            statusDiv.style.display = 'none';
         }
     </script>
 </body>
