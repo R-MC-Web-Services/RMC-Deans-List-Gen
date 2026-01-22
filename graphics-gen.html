@@ -1,23 +1,12 @@
 <!DOCTYPE html>
-<html lang='en' class=''>
-
+<html lang="en">
 <head>
-
-  <meta charset='UTF-8'>
-  <title>CodePen Demo</title>
-
-  <meta name="robots" content="noindex">
-
-  <link rel="shortcut icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico">
-  <link rel="mask-icon" href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-b4b4269c16397ad2f0f7a01bcdf513a1994f4c94b8af2f191c09eb0d601762b1.svg" color="#111">
-  <link rel="canonical" href="https://codepen.io/brenthoard/pen/gbMROPv">
-
-  
-  
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap">
-
-  <style id="INLINE_PEN_STYLESHEET_ID">
-    * {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dean's List Certificate Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -159,57 +148,270 @@
             margin-top: 15px;
             display: none;
         }
-  </style>
-
-  
-<script src="https://cpwebassets.codepen.io/assets/common/stopExecutionOnTimeout-2c7831bb44f98c1391d6a4ffda0e1fd302503391ca806e7fcc7b9b87197aec26.js"></script>
-<script src="https://cpwebassets.codepen.io/assets/editor/iframe/iframeConsoleRunner-6d8bf8b4b479137260842506acbb12717dace0823c023e08b96360e60b0840d9.js"></script>
-<script src="https://cpwebassets.codepen.io/assets/editor/iframe/iframeRefreshCSS-44fe83e49b63affec96918c9af88c0d80b209a862cf87ac46bc933074b8c557d.js"></script>
-<script src="https://cpwebassets.codepen.io/assets/editor/iframe/iframeRuntimeErrors-4f205f2c14e769b448bcf477de2938c681660d5038bc464e3700256713ebe261.js"></script>
+    </style>
 </head>
-
 <body>
-  <div class="container">
-  <h1>🎓 RMC Dean's List Certificate Generator</h1>
-  <p class="subtitle">Upload your template and Excel file to generate certificates. The Excel file must have a first_name, last_name and "major" column, nothing more.</p>
-
-  <div class="upload-section">
-    <label for="template">Template Image (PNG/JPG):</label>
-    <input type="file" id="template" accept="image/*">
-  </div>
-
-  <div class="upload-section">
-    <label for="excel">Student Data (Excel/CSV):</label>
-    <input type="file" id="excel" accept=".xlsx,.xls,.csv">
-  </div>
-
-  <div class="upload-section">
-    <label for="prefix">Filename Prefix (e.g., "Fall25", "Spring26"):</label>
-    <input type="text" id="prefix" placeholder="Fall25" style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-family: 'Roboto', sans-serif;">
-  </div>
-
-  <button id="generate" disabled>Generate Certificates</button>
-
-  <div class="progress" id="progress">
-    <div class="progress-bar">
-      <div class="progress-fill" id="progressFill">0%</div>
+    <div class="container">
+        <h1>🎓 Dean's List Certificate Generator</h1>
+        <p class="subtitle">Upload your template and Excel file to generate certificates</p>
+        
+        <div class="upload-section">
+            <label for="template">Template Image (PNG/JPG):</label>
+            <input type="file" id="template" accept="image/*">
+        </div>
+        
+        <div class="upload-section">
+            <label for="excel">Student Data (Excel/CSV):</label>
+            <input type="file" id="excel" accept=".xlsx,.xls,.csv">
+        </div>
+        
+        <div class="upload-section">
+            <label for="prefix">Filename Prefix (e.g., "Fall24", "Spring25"):</label>
+            <input type="text" id="prefix" placeholder="Fall24" style="width: 100%; padding: 12px; border: 2px solid #ffcf00; border-radius: 8px; font-family: 'Roboto', sans-serif;">
+        </div>
+        
+        <button id="generate" disabled>Generate Certificates</button>
+        
+        <div class="progress" id="progress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+            <div class="status" id="status">Ready to generate...</div>
+        </div>
+        
+        <div class="error" id="error"></div>
+        
+        <div class="preview" id="preview">
+            <h3>Preview (First Certificate):</h3>
+            <img id="previewImg" alt="Certificate preview">
+        </div>
     </div>
-    <div class="status" id="status">Ready to generate...</div>
-  </div>
-
-  <div class="error" id="error"></div>
-
-  <div class="preview" id="preview">
-    <h3>Preview (First Certificate):</h3>
-    <img id="previewImg" alt="Certificate preview">
-  </div>
-</div>
-
-<canvas id="canvas" style="display: none;"></canvas>
-  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script  src="https://cdpn.io/cpe/boomboom/pen.js?key=pen.js-ba8bb1da-5019-a237-2262-91de4790e3b0" crossorigin></script>
+    
+    <canvas id="canvas" style="display: none;"></canvas>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script>
+        let templateImage = null;
+        let studentData = [];
+        let fontLoaded = false;
+        
+        const templateInput = document.getElementById('template');
+        const excelInput = document.getElementById('excel');
+        const prefixInput = document.getElementById('prefix');
+        const generateBtn = document.getElementById('generate');
+        const progressDiv = document.getElementById('progress');
+        const progressFill = document.getElementById('progressFill');
+        const statusDiv = document.getElementById('status');
+        const errorDiv = document.getElementById('error');
+        const previewDiv = document.getElementById('preview');
+        const previewImg = document.getElementById('previewImg');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Ensure font is loaded
+        document.fonts.ready.then(() => {
+            fontLoaded = true;
+        });
+        
+        // Load template image
+        templateInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const img = new Image();
+            img.onload = () => {
+                templateImage = img;
+                checkReady();
+            };
+            img.src = URL.createObjectURL(file);
+        });
+        
+        // Load Excel/CSV file
+        excelInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            try {
+                const data = await file.arrayBuffer();
+                const workbook = XLSX.read(data);
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                
+                console.log('Raw Excel data:', jsonData); // Debug
+                
+                // Show available column names
+                if (jsonData.length > 0) {
+                    console.log('Available columns:', Object.keys(jsonData[0]));
+                }
+                
+                studentData = jsonData.map(row => {
+                    // Try multiple column name variations
+                    const first = row.First || row.first || row.FIRST || row['First Name'] || row.firstname || row.FirstName || row.first_name || row.FIRST_NAME || '';
+                    const last = row.Last || row.last || row.LAST || row['Last Name'] || row.lastname || row.LastName || row.last_name || row.LAST_NAME || '';
+                    const major = row.Major || row.major || row.MAJOR || '';
+                    const semester = row.Semester || row.semester || row.SEMESTER || '';
+                    const year = row.Year || row.year || row.YEAR || '';
+                    
+                    console.log('Mapping row:', { 
+                        rawRow: row, 
+                        mapped: { first, last, major, semester, year } 
+                    }); // Debug each row
+                    
+                    return { first, last, major, semester, year };
+                });
+                
+                console.log('Processed student data:', studentData); // Debug
+                
+                if (studentData.length === 0) {
+                    showError('No student data found in file');
+                } else {
+                    statusDiv.textContent = `Loaded ${studentData.length} students`;
+                    statusDiv.style.display = 'block';
+                }
+                
+                checkReady();
+            } catch (err) {
+                showError('Error reading file: ' + err.message);
+            }
+        });
+        
+        function checkReady() {
+            if (templateImage && studentData.length > 0 && fontLoaded) {
+                generateBtn.disabled = false;
+            }
+        }
+        
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        async function generateCertificate(student) {
+            // Set canvas to template size
+            canvas.width = templateImage.width;
+            canvas.height = templateImage.height;
+            
+            // Draw template
+            ctx.drawImage(templateImage, 0, 0);
+            
+            // Calculate positions (60% down for name)
+            const centerX = canvas.width / 2;
+            const nameY = canvas.height * 0.60;
+            const majorY = nameY + 50; // 50px below name for spacing
+            
+            // Enable antialiasing for smoother text
+            ctx.imageSmoothingEnabled = true;
+            
+            // Draw student name with multiple attempts for visibility
+            const fullName = `${student.first} ${student.last}`.trim();
+            
+            console.log(`Drawing name: "${fullName}" at position ${centerX}, ${nameY}`); // Debug
+            
+            // Try with different font specifications to ensure rendering
+            ctx.font = 'bold 26px Roboto, Arial, sans-serif';
+            ctx.fillStyle = '#000000';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Add shadow for visibility
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 2;
+            ctx.shadowOffsetX = 1;
+            ctx.shadowOffsetY = 1;
+            
+            ctx.fillText(fullName, centerX, nameY);
+            
+            // Reset shadow for major
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
+            // Draw major
+            ctx.font = '20px Roboto, Arial, sans-serif';
+            ctx.fillStyle = '#FF0000';
+            console.log(`Drawing major: "${student.major}" at position ${centerX}, ${majorY}`); // Debug
+            ctx.fillText(student.major, centerX, majorY);
+            
+            // Convert to blob
+            return new Promise((resolve) => {
+                canvas.toBlob((blob) => {
+                    resolve(blob);
+                }, 'image/png');
+            });
+        }
+        
+        generateBtn.addEventListener('click', async () => {
+            const prefix = prefixInput.value.trim() || 'cert';
+            
+            generateBtn.disabled = true;
+            progressDiv.style.display = 'block';
+            errorDiv.style.display = 'none';
+            previewDiv.style.display = 'none';
+            
+            try {
+                const zip = new JSZip();
+                const total = studentData.length;
+                let firstPreview = null;
+                
+                for (let i = 0; i < total; i++) {
+                    const student = studentData[i];
+                    statusDiv.textContent = `Generating certificate ${i + 1} of ${total}...`;
+                    progressFill.style.width = ((i / total) * 100) + '%';
+                    progressFill.textContent = Math.round((i / total) * 100) + '%';
+                    
+                    console.log(`Processing student ${i + 1}:`, student); // Debug
+                    
+                    const blob = await generateCertificate(student);
+                    
+                    // Save first for preview
+                    if (i === 0) {
+                        firstPreview = URL.createObjectURL(blob);
+                    }
+                    
+                    // Create filename: Prefix-FirstLast.png
+                    const filename = `${prefix}-${student.first}${student.last}.png`;
+                    
+                    console.log(`Saving file ${i + 1} as: ${filename}`); // Debug
+                    
+                    zip.file(filename, blob);
+                    
+                    // Small delay to prevent browser freezing
+                    await new Promise(resolve => setTimeout(resolve, 10));
+                }
+                
+                // Show preview
+                if (firstPreview) {
+                    previewImg.src = firstPreview;
+                    previewDiv.style.display = 'block';
+                }
+                
+                // Generate and download ZIP
+                statusDiv.textContent = 'Creating ZIP file...';
+                progressFill.style.width = '100%';
+                progressFill.textContent = '100%';
+                
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                const url = URL.createObjectURL(zipBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'deans-list-certificates.zip';
+                a.click();
+                
+                statusDiv.textContent = `✅ Successfully generated ${total} certificates!`;
+                
+            } catch (err) {
+                showError('Error generating certificates: ' + err.message);
+                console.error(err);
+            } finally {
+                generateBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
-
 </html>
