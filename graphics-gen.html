@@ -216,26 +216,51 @@
         //    fontLoaded = true;
         //});
 
-        // Wait for Adobe Fonts to load
+       // Wait for Adobe Fonts to load
         async function waitForFonts() {
             try {
+                // Create a test element to force font load
+                const testDiv = document.createElement('div');
+                testDiv.style.fontFamily = '"meno-display", serif';
+                testDiv.style.fontWeight = '400';
+                testDiv.style.fontStyle = 'normal';
+                testDiv.style.fontSize = '150pt';
+                testDiv.style.position = 'absolute';
+                testDiv.style.left = '-9999px';
+                testDiv.textContent = 'Test';
+                document.body.appendChild(testDiv);
+                
                 // Wait for document.fonts to be ready
                 await document.fonts.ready;
                 
-                // Additionally wait a bit for Adobe Fonts specifically
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                // Verify the font is loaded
-                if (document.fonts.check('150pt "meno-display"')) {
-                    console.log('meno-display font loaded successfully');
-                    fontLoaded = true;
-                } else {
-                    console.warn('meno-display font may not be loaded, will use fallback');
-                    fontLoaded = true; // Still proceed
+                // Wait longer for Adobe Fonts
+                let attempts = 0;
+                while (attempts < 20) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    
+                    // Check if font is available with proper weight
+                    const isFontLoaded = document.fonts.check('400 150pt "meno-display"');
+                    
+                    if (isFontLoaded) {
+                        console.log('✅ meno-display font loaded successfully after', (attempts + 1) * 200, 'ms');
+                        document.body.removeChild(testDiv);
+                        fontLoaded = true;
+                        checkReady();
+                        return;
+                    }
+                    
+                    attempts++;
                 }
+                
+                console.warn('⚠️ meno-display font did not load after 4 seconds, using fallback');
+                document.body.removeChild(testDiv);
+                fontLoaded = true;
+                checkReady();
+                
             } catch (err) {
                 console.error('Font loading error:', err);
-                fontLoaded = true; // Proceed anyway with fallback
+                fontLoaded = true;
+                checkReady();
             }
         }
         
@@ -340,7 +365,7 @@
             console.log(`Drawing name: "${fullName}" at position ${centerX}, ${nameY}`); // Debug
             
             // Try with different font specifications to ensure rendering
-            ctx.font = 'bold 150pt "meno-display", Arial, sans-serif';
+            ctx.font = '400 150pt "meno-display", serif';
             ctx.fillStyle = '#000000';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
