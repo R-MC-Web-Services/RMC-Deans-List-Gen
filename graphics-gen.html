@@ -212,9 +212,35 @@
         const ctx = canvas.getContext('2d');
         
         // Ensure font is loaded
-        document.fonts.ready.then(() => {
-            fontLoaded = true;
-        });
+        //document.fonts.ready.then(() => {
+        //    fontLoaded = true;
+        //});
+
+        // Wait for Adobe Fonts to load
+        async function waitForFonts() {
+            try {
+                // Wait for document.fonts to be ready
+                await document.fonts.ready;
+                
+                // Additionally wait a bit for Adobe Fonts specifically
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Verify the font is loaded
+                if (document.fonts.check('150pt "meno-display"')) {
+                    console.log('meno-display font loaded successfully');
+                    fontLoaded = true;
+                } else {
+                    console.warn('meno-display font may not be loaded, will use fallback');
+                    fontLoaded = true; // Still proceed
+                }
+            } catch (err) {
+                console.error('Font loading error:', err);
+                fontLoaded = true; // Proceed anyway with fallback
+            }
+        }
+        
+        // Start loading fonts immediately
+        waitForFonts();
         
         // Load template image
         templateInput.addEventListener('change', async (e) => {
@@ -300,7 +326,7 @@
             // Draw template
             ctx.drawImage(templateImage, 0, 0);
             
-            // Calculate positions (60% down for name)
+            // Calculate positions (75% down for name)
             const centerX = canvas.width / 2;
             const nameY = canvas.height * 0.75; // 75% down for name
             const majorY = nameY + 50; // 50px below name for spacing
