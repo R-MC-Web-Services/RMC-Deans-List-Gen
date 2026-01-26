@@ -167,8 +167,8 @@
         </div>
         
         <div class="upload-section">
-            <label for="prefix">Filename Prefix (e.g., "Fall24", "Spring25"):</label>
-            <input type="text" id="prefix" placeholder="Fall24" style="width: 100%; padding: 12px; border: 2px solid #ffcf00; border-radius: 8px; font-family: 'Roboto', sans-serif;">
+            <label for="prefix">Filename Prefix (e.g., "Fall25", "Spring26"):</label>
+            <input type="text" id="prefix" placeholder="Fall25" style="width: 100%; padding: 12px; border: 2px solid #ffcf00; border-radius: 8px; font-family: 'Roboto', sans-serif;">
         </div>
         
         <button id="generate" disabled>Generate Certificates</button>
@@ -302,7 +302,7 @@
             
             // Calculate positions (60% down for name)
             const centerX = canvas.width / 2;
-            const nameY = canvas.height * 0.60;
+            const nameY = canvas.height * 0.75; // 75% down for name
             const majorY = nameY + 50; // 50px below name for spacing
             
             // Enable antialiasing for smoother text
@@ -314,7 +314,7 @@
             console.log(`Drawing name: "${fullName}" at position ${centerX}, ${nameY}`); // Debug
             
             // Try with different font specifications to ensure rendering
-            ctx.font = 'bold 30px "meno-display", Arial, sans-serif';
+            ctx.font = 'bold 30pt "meno-display", Arial, sans-serif';
             ctx.fillStyle = '#000000';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
