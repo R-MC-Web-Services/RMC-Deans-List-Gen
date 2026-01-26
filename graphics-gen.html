@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dean's List Certificate Generator</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.typekit.net/juq2qzr.css"> <!-- For the students' names -->
     <style>
         * {
             margin: 0;
@@ -313,7 +314,7 @@
             console.log(`Drawing name: "${fullName}" at position ${centerX}, ${nameY}`); // Debug
             
             // Try with different font specifications to ensure rendering
-            ctx.font = 'bold 26px Roboto, Arial, sans-serif';
+            ctx.font = 'bold 30px "meno-display", Arial, sans-serif';
             ctx.fillStyle = '#000000';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -333,8 +334,8 @@
             ctx.shadowOffsetY = 0;
             
             // Draw major
-            ctx.font = '20px Roboto, Arial, sans-serif';
-            ctx.fillStyle = '#FF0000';
+            ctx.font = '24px Roboto, Arial, sans-serif';
+            ctx.fillStyle = '#000000';
             console.log(`Drawing major: "${student.major}" at position ${centerX}, ${majorY}`); // Debug
             ctx.fillText(student.major, centerX, majorY);
             
