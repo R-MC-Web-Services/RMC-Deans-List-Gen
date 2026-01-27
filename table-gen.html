@@ -342,13 +342,24 @@
 }
 
 .certificate-image {
-    max-width: 100%;
+    max-width: 70vw;
     height: auto;
     display: block;
     margin: 0 auto 20px;
     border-radius: 4px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
+
+@media (min-width: 768px) {
+    .certificate-image {
+        max-width: 25vw; /* default for desktop */
+        height: auto;
+        /* display: block;
+        margin: 0 auto 20px;
+        border-radius: 4px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2); */
+        margin: 0 auto !important;
+    }
 
 .social-share {
     text-align: center;
