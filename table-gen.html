@@ -470,16 +470,15 @@
             
             filteredStudents.forEach(student => {
                 const row = document.createElement('tr');
-                row.innerHTML = '<td><a href="#" class="student-name" data-first="' + student.first + '" data-last="' + student.last + '">' + student.last + ', ' + student.first + '</a></td><td>' + student.major + '</td>';
+                row.innerHTML = '<td><a href="#" class="student-name" data-url="' + student.url + '">' + student.last + ', ' + student.first + '</a></td><td>' + student.major + '</td>';
                 tableBody.appendChild(row);
             });
             
             document.querySelectorAll('.student-name').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const first = e.target.dataset.first;
-                    const last = e.target.dataset.last;
-                    const student = students.find(s => s.first === first && s.last === last);
+                    const url = e.target.dataset.url;
+                    const student = students.find(s => s.url === url);
                     if (student) openModal(student);
                 });
             });
@@ -510,7 +509,7 @@
             modalCertificate.alt = 'Dean\\'s List Certificate for ' + student.first + ' ' + student.last;
             
             const shareText = encodeURIComponent(student.first + ' ' + student.last + ' has earned Dean\\'s List recognition at Randolph-Macon College!');
-            const shareUrl = encodeURIComponent('https://www.rmc.edu/academics/deans-list/');
+            const shareUrl = encodeURIComponent(window.location.origin + window.location.pathname + '?student=' + student.url);
             
             facebookShare.href = 'https://www.facebook.com/sharer/sharer.php?u=' + shareUrl + '&quote=' + shareText;
             twitterShare.href = 'https://twitter.com/intent/tweet?text=' + shareText + '&url=' + shareUrl;
@@ -542,7 +541,21 @@
             }
         });
         
+        // Check for student query parameter on page load
+        function checkForDeepLink() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentUrl = urlParams.get('student');
+            
+            if (studentUrl) {
+                const student = students.find(s => s.url === studentUrl);
+                if (student) {
+                    openModal(student);
+                }
+            }
+        }
+        
         renderTable(students);
+        checkForDeepLink();
     }
     
     if (document.readyState === 'loading') {
@@ -594,8 +607,11 @@
                     const first = row.First || row.first || row.FIRST || row['First Name'] || row.firstname || row.FirstName || row.first_name || row.FIRST_NAME || '';
                     const last = row.Last || row.last || row.LAST || row['Last Name'] || row.lastname || row.LastName || row.last_name || row.LAST_NAME || '';
                     const major = row.Major || row.major || row.MAJOR || '';
+
+                    // Generate URL-friendly parameter
+                    const url = (first + '-' + last).toLowerCase().replace(/[^a-z0-9-]/g, '');
                     
-                    return { first, last, major };
+                    return { first, last, major, url };
                 });
                 
                 if (studentData.length === 0) {
@@ -630,6 +646,7 @@
                 first: s.first,
                 last: s.last,
                 major: s.major,
+                url: s.url,
                 image: path + prefix + '-' + s.first + s.last + '.png'
             })), null, 2);
             
