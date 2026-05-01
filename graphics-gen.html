@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dean's List Certificate Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Red+Hat+Display:wght@400;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://use.typekit.net/juq2qzr.css"> <!-- For the students' names -->
     <style>
         * {
@@ -353,8 +354,8 @@
             
             // Calculate positions (75% down for name)
             const centerX = canvas.width / 2;
-            const nameY = canvas.height * 0.75; // 75% down for name
-            const majorY = nameY + 50; // 50px below name for spacing
+            const nameY = canvas.height * 0.78; // 75% down for name
+            const majorY = nameY + 170; // 50px below name for spacing
             
             // Enable antialiasing for smoother text
             ctx.imageSmoothingEnabled = true;
@@ -366,7 +367,7 @@
             
             // Try with different font specifications to ensure rendering
             ctx.font = '400 150pt "meno-display", serif';
-            ctx.fillStyle = '#000000';
+            ctx.fillStyle = '#ffcf00';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             
@@ -385,10 +386,10 @@
             ctx.shadowOffsetY = 0;
             
             // Draw major
-            ctx.font = '24px Roboto, Arial, sans-serif';
-            ctx.fillStyle = '#000000';
+            ctx.font = '700 78pt "Red Hat Display", sans-serif';
+            ctx.fillStyle = '#ffffff';
             console.log(`Drawing major: "${student.major}" at position ${centerX}, ${majorY}`); // Debug
-            ctx.fillText(student.major, centerX, majorY);
+            ctx.fillText(student.major.toUpperCase(), centerX, majorY);
             
             // Convert to blob
             return new Promise((resolve) => {
