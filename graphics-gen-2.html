@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dean's List Certificate Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Red+Hat+Display:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://use.typekit.net/juq2qzr.css"> <!-- For the students' names -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #000 0%, #ffcf00 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .upload-section {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed #ffcf00;
+            border-radius: 8px;
+            background: #fffbf0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        input[type="file"]:hover {
+            border-color: #000;
+            background: #fff9e6;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #ffcf00 0%, #ffb000 100%);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 207, 0, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffcf00 0%, #ffb000 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        .status {
+            color: #666;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .preview {
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        .preview img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Dean's List Certificate Generator</h1>
+        <p class="subtitle">Upload your template and Excel file to generate certificates</p>
+        
+        <div class="upload-section">
+            <label for="template">Template Image (PNG/JPG):</label>
+            <input type="file" id="template" accept="image/*">
+        </div>
+        
+        <div class="upload-section">
+            <label for="excel">Student Data (Excel/CSV):</label>
+            <input type="file" id="excel" accept=".xlsx,.xls,.csv">
+        </div>
+        
+        <div class="upload-section">
+            <label for="prefix">Filename Prefix (e.g., "Fall25", "Spring26"):</label>
+            <input type="text" id="prefix" placeholder="Fall25" style="width: 100%; padding: 12px; border: 2px solid #ffcf00; border-radius: 8px; font-family: 'Roboto', sans-serif;">
+        </div>
+        
+        <button id="generate" disabled>Generate Certificates</button>
+        
+        <div class="progress" id="progress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+            <div class="status" id="status">Ready to generate...</div>
+        </div>
+        
+        <div class="error" id="error"></div>
+        
+        <div class="preview" id="preview">
+            <h3>Preview (First Certificate):</h3>
+            <img id="previewImg" alt="Certificate preview">
+        </div>
+    </div>
+    
+    <canvas id="canvas" style="display: none;"></canvas>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script>
+        let templateImage = null;
+        let studentData = [];
+        let fontLoaded = false;
+        
+        const templateInput = document.getElementById('template');
+        const excelInput = document.getElementById('excel');
+        const prefixInput = document.getElementById('prefix');
+        const generateBtn = document.getElementById('generate');
+        const progressDiv = document.getElementById('progress');
+        const progressFill = document.getElementById('progressFill');
+        const statusDiv = document.getElementById('status');
+        const errorDiv = document.getElementById('error');
+        const previewDiv = document.getElementById('preview');
+        const previewImg = document.getElementById('previewImg');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Ensure font is loaded
+        //document.fonts.ready.then(() => {
+        //    fontLoaded = true;
+        //});
+
+       // Wait for Adobe Fonts to load
+        async function waitForFonts() {
+            try {
+                // Create a test element to force font load
+                const testDiv = document.createElement('div');
+                testDiv.style.fontFamily = '"meno-display", serif';
+                testDiv.style.fontWeight = '400';
+                testDiv.style.fontStyle = 'normal';
+                testDiv.style.fontSize = '150pt';
+                testDiv.style.position = 'absolute';
+                testDiv.style.left = '-9999px';
+                testDiv.textContent = 'Test';
+                document.body.appendChild(testDiv);
+                
+                // Wait for document.fonts to be ready
+                await document.fonts.ready;
+                
+                // Wait longer for Adobe Fonts
+                let attempts = 0;
+                while (attempts < 20) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    
+                    // Check if font is available with proper weight
+                    const isFontLoaded = document.fonts.check('400 150pt "meno-display"');
+                    
+                    if (isFontLoaded) {
+                        console.log('✅ meno-display font loaded successfully after', (attempts + 1) * 200, 'ms');
+                        document.body.removeChild(testDiv);
+                        fontLoaded = true;
+                        checkReady();
+                        return;
+                    }
+                    
+                    attempts++;
+                }
+                
+                console.warn('⚠️ meno-display font did not load after 4 seconds, using fallback');
+                document.body.removeChild(testDiv);
+                fontLoaded = true;
+                checkReady();
+                
+            } catch (err) {
+                console.error('Font loading error:', err);
+                fontLoaded = true;
+                checkReady();
+            }
+        }
+        
+        // Start loading fonts immediately
+        waitForFonts();
+        
+        // Load template image
+        templateInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const img = new Image();
+            img.onload = () => {
+                templateImage = img;
+                checkReady();
+            };
+            img.src = URL.createObjectURL(file);
+        });
+        
+        // Load Excel/CSV file
+        excelInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            try {
+                const data = await file.arrayBuffer();
+                const workbook = XLSX.read(data);
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                
+                console.log('Raw Excel data:', jsonData); // Debug
+                
+                // Show available column names
+                if (jsonData.length > 0) {
+                    console.log('Available columns:', Object.keys(jsonData[0]));
+                }
+                
+                studentData = jsonData.map(row => {
+                    // Try multiple column name variations
+                    const first = row.First || row.first || row.FIRST || row['First Name'] || row.firstname || row.FirstName || row.first_name || row.FIRST_NAME || '';
+                    const last = row.Last || row.last || row.LAST || row['Last Name'] || row.lastname || row.LastName || row.last_name || row.LAST_NAME || '';
+                    const major = row.Major || row.major || row.MAJOR || '';
+                    const semester = row.Semester || row.semester || row.SEMESTER || '';
+                    const year = row.Year || row.year || row.YEAR || '';
+                    
+                    console.log('Mapping row:', { 
+                        rawRow: row, 
+                        mapped: { first, last, major, semester, year } 
+                    }); // Debug each row
+                    
+                    return { first, last, major, semester, year };
+                });
+                
+                console.log('Processed student data:', studentData); // Debug
+                
+                if (studentData.length === 0) {
+                    showError('No student data found in file');
+                } else {
+                    statusDiv.textContent = `Loaded ${studentData.length} students`;
+                    statusDiv.style.display = 'block';
+                }
+                
+                checkReady();
+            } catch (err) {
+                showError('Error reading file: ' + err.message);
+            }
+        });
+        
+        function checkReady() {
+            if (templateImage && studentData.length > 0 && fontLoaded) {
+                generateBtn.disabled = false;
+            }
+        }
+        
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        async function generateCertificate(student) {
+            // Set canvas to template size
+            canvas.width = templateImage.width;
+            canvas.height = templateImage.height;
+            
+            // Draw template
+            ctx.drawImage(templateImage, 0, 0);
+            
+            // Calculate positions (75% down for name)
+            const centerX = canvas.width / 2;
+            const nameY = canvas.height * 0.78; // 75% down for name
+            const majorY = nameY + 170; // 50px below name for spacing
+            
+            // Enable antialiasing for smoother text
+            ctx.imageSmoothingEnabled = true;
+            
+            // Draw student name with multiple attempts for visibility
+            const fullName = `${student.first} ${student.last}`.trim();
+            
+            console.log(`Drawing name: "${fullName}" at position ${centerX}, ${nameY}`); // Debug
+            
+            // Try with different font specifications to ensure rendering
+            ctx.font = '400 150pt "meno-display", serif';
+            ctx.fillStyle = '#ffcf00';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Add shadow for visibility
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 2;
+            ctx.shadowOffsetX = 1;
+            ctx.shadowOffsetY = 1;
+            
+            ctx.fillText(fullName, centerX, nameY);
+            
+            // Reset shadow for major
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
+            // Draw major
+            ctx.font = '700 50pt "Red Hat Display", sans-serif';
+            ctx.fillStyle = '#ffffff';
+            console.log(`Drawing major: "${student.major}" at position ${centerX}, ${majorY}`); // Debug
+            ctx.fillText(student.major.toUpperCase(), centerX, majorY);
+            
+            // Convert to blob
+            return new Promise((resolve) => {
+                canvas.toBlob((blob) => {
+                    resolve(blob);
+                }, 'image/png');
+            });
+        }
+        
+        generateBtn.addEventListener('click', async () => {
+            const prefix = prefixInput.value.trim() || 'cert';
+            
+            generateBtn.disabled = true;
+            progressDiv.style.display = 'block';
+            errorDiv.style.display = 'none';
+            previewDiv.style.display = 'none';
+            
+            try {
+                const zip = new JSZip();
+                const total = studentData.length;
+                let firstPreview = null;
+                
+                for (let i = 0; i < total; i++) {
+                    const student = studentData[i];
+                    statusDiv.textContent = `Generating certificate ${i + 1} of ${total}...`;
+                    progressFill.style.width = ((i / total) * 100) + '%';
+                    progressFill.textContent = Math.round((i / total) * 100) + '%';
+                    
+                    console.log(`Processing student ${i + 1}:`, student); // Debug
+                    
+                    const blob = await generateCertificate(student);
+                    
+                    // Save first for preview
+                    if (i === 0) {
+                        firstPreview = URL.createObjectURL(blob);
+                    }
+                    
+                    // Create filename: Prefix-FirstLast.png
+                    const filename = `${prefix}-${student.first}${student.last}.png`;
+                    
+                    console.log(`Saving file ${i + 1} as: ${filename}`); // Debug
+                    
+                    zip.file(filename, blob);
+                    
+                    // Small delay to prevent browser freezing
+                    await new Promise(resolve => setTimeout(resolve, 10));
+                }
+                
+                // Show preview
+                if (firstPreview) {
+                    previewImg.src = firstPreview;
+                    previewDiv.style.display = 'block';
+                }
+                
+                // Generate and download ZIP
+                statusDiv.textContent = 'Creating ZIP file...';
+                progressFill.style.width = '100%';
+                progressFill.textContent = '100%';
+                
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                const url = URL.createObjectURL(zipBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'deans-list-certificates.zip';
+                a.click();
+                
+                statusDiv.textContent = `✅ Successfully generated ${total} certificates!`;
+                
+            } catch (err) {
+                showError('Error generating certificates: ' + err.message);
+                console.error(err);
+            } finally {
+                generateBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
